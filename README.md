@@ -1,1 +1,1 @@
-# corect_orientation
+# correct_orientation
