@@ -5,14 +5,6 @@ import os
 from zipfile import ZipFile
 
 
-rotated_dict = {
-    'rotated_left': 90,
-    'rotated_right': 270,
-    'upside_down': 180,
-    'upright': 0,
-}
-
-
 def read_path(folder_path, size):
     images = []
     for img in os.listdir(folder_path):
@@ -30,14 +22,18 @@ def read_path(folder_path, size):
 def zip_path(path, files):
     with ZipFile(path, 'w') as zip:
         for file in files:
-
             zip.write(file)
 
 
-def rotate(image, orientation, save_path):
-    global rotated_dict
+def rotate(path, image, orientation, save_path):
+    rotated_dict = {
+        '0': 270,
+        '1': 90,
+        '2': 0,
+        '3': 180,
+    }
 
-    img = cv2.imread(image)
+    img = cv2.imread(path + '/' + image)
 
     # get image height, width
     (h, w) = img.shape[:2]
@@ -45,7 +41,7 @@ def rotate(image, orientation, save_path):
     center = (w / 2, h / 2)
     scale = 1.0
 
-    M = cv2.getRotationMatrix2D(center, rotated_dict['orientation'], scale)
+    M = cv2.getRotationMatrix2D(center, rotated_dict.get(orientation), scale)
     img = cv2.warpAffine(img, M, (h, w))
 
     cv2.imwrite(save_path + '/' + image, img)
