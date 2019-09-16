@@ -1,4 +1,3 @@
-import argparse
 import click
 import logging
 import os
