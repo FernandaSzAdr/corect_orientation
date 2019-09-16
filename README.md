@@ -28,6 +28,8 @@ If you want to run the second model, execute:
 
 `$ python main.py -my`
 
+The return (images with correct orientation) will be in the directory `output/` (if you don't have this directory the code will create for you)
+
 > OBSERVATION
 
 > The model weights are already in the project, so execution will only generate the correctly rotated images. If you want to retrain the model, delete the files in the folder `correct_orientation/utils/files/`
