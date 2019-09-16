@@ -28,8 +28,9 @@ def read_path(folder_path, size):
 
 def zip_path(path, files):
     with ZipFile(path, 'w') as zip:
-        for files in files:
-            zip.write(files)
+        for file in files:
+            file = file.replace('jpg', 'png')
+            zip.write(file)
 
 
 def rotate(path, image, orientation, save_path):

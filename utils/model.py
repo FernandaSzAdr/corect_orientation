@@ -89,6 +89,7 @@ class Model:
         plt.savefig(path.format('loss_epoch.jpg'))
 
     def save_model(self):
+        path = self.path_utils
         if self.my_model:
             path = self.path_utils.format('my_model_{}')
 
@@ -100,6 +101,7 @@ class Model:
         logging.info('Model and your weights were save in "utils/files"!')
 
     def load_model(self):
+        path = self.path_utils
         if self.my_model:
             path = self.path_utils.format('my_model_{}')
 
