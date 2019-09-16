@@ -28,7 +28,9 @@ If you want to run the second model, execute:
 
 `$ python main.py -my`
 
-The return (images with correct orientation) will be in the directory `output/` (if you don't have this directory the code will create for you)
+The return will be in the directory `output/` (if you don't have this directory the code will create for you)
+
+- The return are images with correct orientation in a zip file, a pickle for numpy array with contains all images with correct orientation (5361, 64, 64, 3) and a csv with the label and the image returned from the model.
 
 > OBSERVATION
 
