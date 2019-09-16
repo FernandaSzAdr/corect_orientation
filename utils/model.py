@@ -104,7 +104,6 @@ class Model:
                                                 target_size=self.shape[:2],
                                                 batch_size=32,
                                                 subset=type,)
-
         return generator
 
     def train(self):
@@ -124,5 +123,5 @@ class Model:
 
     @property
     def predictions(self):
-        x_test = read_path('database/test', self.shape[:2])
-        return self.model.predict(x_test)
+        x_test = read_path(self.path_database.format('test'), self.shape[:2])
+        return self.model.predict_classes(x_test)
