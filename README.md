@@ -36,12 +36,14 @@ The return will be in the directory `output/` (if you don't have this directory 
 
 > The model weights are already in the project, so execution will only generate the correctly rotated images. If you want to retrain the model, delete the files in the folder `correct_orientation/utils/files/`
 
+> In all models the input are images with 32x32, but the original image have 64x64. This decision was made by providing faster executions.
+
 1) The first model was the CIFAR10 from [Keras](https://keras.io/examples/cifar10_cnn/):
 
 ```
 model = Sequential()
 model.add(Conv2D(32, (3, 3), padding='same',
-                 input_shape=x_train.shape[1:]))
+                 input_shape=(32, 32, 3))
 model.add(Activation('relu'))
 model.add(Conv2D(32, (3, 3)))
 model.add(Activation('relu'))
@@ -72,7 +74,7 @@ You can see the model behavior during training in the figure:
 ```
 model = Sequential()
 model.add(Conv2D(32, (3, 3), padding='same',
-                 input_shape=x_train.shape[1:]))
+                 input_shape=(32, 32, 3))
 model.add(Activation('relu'))
 model.add(Conv2D(32, (3, 3)))
 model.add(Activation('relu'))
