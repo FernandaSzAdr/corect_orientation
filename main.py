@@ -3,7 +3,7 @@ import logging
 import os
 
 from utils.model import model
-from utils.path import create_path, remove_path, dump_results
+from utils.path import create_output, create_path, remove_path, dump_results
 from utils.work_images import rotate
 
 
@@ -21,6 +21,8 @@ logging.basicConfig(format='%(levelname)s:%(message)s',
 def main(my_model):
     path_results = 'test'
     path_test = 'database/test'
+
+    create_output('output')
 
     """
         Return the model trained. If don't have already a model trained, will

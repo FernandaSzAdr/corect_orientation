@@ -7,6 +7,11 @@ import shutil
 from utils.work_images import zip_path
 
 
+def create_output(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
 def create_path(path_results):
     if not os.path.exists(path_results):
         os.makedirs(path_results)
