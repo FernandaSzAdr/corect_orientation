@@ -1,3 +1,5 @@
+import argparse
+import click
 import logging
 import os
 
@@ -10,7 +12,14 @@ logging.basicConfig(format='%(levelname)s:%(message)s',
                     level=logging.INFO)
 
 
-if __name__ == '__main__':
+@click.command()
+@click.option(
+    '--my_model/--no_my_model',
+    '-my/-nomy',
+    help='Type of model that will run.',
+    required=True,
+)
+def main(my_model):
     path_results = 'test'
     path_test = 'database/test'
 
@@ -19,7 +28,8 @@ if __name__ == '__main__':
         going to train the model.
     """
     _model = model(shape=(32, 32, 3), num_classes=4, is_plot=True,
-                   path_database='database/{}', epochs=8)
+                   path_database='database/{}', epochs=8,
+                   my_model=my_model)
 
     """
         Path 'test/' is create exclusively to save model corrected images.
@@ -56,3 +66,7 @@ if __name__ == '__main__':
     logging.info('The result is dump in "output/"!')
 
     remove_path(path_results)
+
+
+if __name__ == '__main__':
+    main()

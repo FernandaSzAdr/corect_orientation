@@ -15,15 +15,18 @@ from keras.preprocessing.image import ImageDataGenerator
 
 class Model:
 
-    def __init__(self, shape, num_classes, is_plot, path_database, epochs):
+    def __init__(self, shape, num_classes, is_plot, path_database, epochs,
+                 my_model):
         self.opt = keras.optimizers.rmsprop(lr=0.0001, decay=1e-5)
         self.shape = shape
         self.num_classes = num_classes
         self.model = None
         self.is_plot = is_plot
+        self.path_utils = 'utils/files/{}'
         self.path_database = path_database
         self.epochs = epochs
         self.history = None
+        self.my_model = my_model
 
     def compile_model(self):
         self.model.compile(loss='categorical_crossentropy',
@@ -51,8 +54,11 @@ class Model:
         model.add(Flatten())
         model.add(Dense(512))
         model.add(Activation('relu'))
-        model.add(Dense(512))
-        model.add(Activation('relu'))
+
+        if self.my_model:
+            model.add(Dense(512))
+            model.add(Activation('relu'))
+
         model.add(Dropout(0.5))
         model.add(Dense(self.num_classes))
         model.add(Activation('softmax'))
@@ -60,13 +66,18 @@ class Model:
         self.model = model
 
     def plot(self):
+        path = self.path_utils
+
+        if self.my_model:
+            path = self.path_utils.format('my_model_{}')
+
         plt.plot(self.history.history['acc'])
         plt.plot(self.history.history['val_acc'])
         plt.title('Model accuracy')
         plt.ylabel('Accuracy')
         plt.xlabel('Epoch')
         plt.legend(['Train', 'Test'], loc='upper left')
-        plt.savefig('utils/files/acc_epoch.jpg')
+        plt.savefig(path.format('acc_epoch.jpg'))
 
         # Plot training & validation loss values
         plt.plot(self.history.history['loss'])
@@ -75,23 +86,29 @@ class Model:
         plt.ylabel('Loss')
         plt.xlabel('Epoch')
         plt.legend(['Train', 'Test'], loc='upper left')
-        plt.savefig('utils/files/loss_epoch.jpg')
+        plt.savefig(path.format('loss_epoch.jpg'))
 
     def save_model(self):
+        if self.my_model:
+            path = self.path_utils.format('my_model_{}')
+
         model_json = self.model.to_json()
-        with open('utils/files/model.json', 'w') as json_files:
+        with open(path.format('model.json'), 'w') as json_files:
             json_files.write(model_json)
 
-        self.model.save_weights('utils/files/model.h5')
+        self.model.save_weights(path.format('model.h5'))
         logging.info('Model and your weights were save in "utils/files"!')
 
     def load_model(self):
-        json_files = open('utils/files/model.json', 'r')
+        if self.my_model:
+            path = self.path_utils.format('my_model_{}')
+
+        json_files = open(path.format('model.json'), 'r')
         loaded_model_json = json_files.read()
         json_files.close()
 
         self.model = model_from_json(loaded_model_json)
-        self.model.load_weights('utils/files/model.h5')
+        self.model.load_weights(path.format('model.h5'))
         logging.info('Successfully loaded trained model!')
 
     def datagen_image(self, type):
@@ -130,16 +147,22 @@ class Model:
         return self.model.predict_classes(x_test)
 
 
-def has_model():
-    return os.path.exists('utils/files/model.h5')
+def has_model(my_model):
+    path = 'utils/files/{}'
+
+    if my_model:
+        path = path.format('my_model_{}')
+
+    return os.path.exists(path.format('model.h5'))
 
 
-def model(shape, num_classes, is_plot, path_database, epochs):
+def model(shape, num_classes, is_plot, path_database, epochs, my_model):
 
     _model = Model(shape=shape, num_classes=num_classes, is_plot=is_plot,
-                   path_database=path_database, epochs=epochs)
+                   path_database=path_database, epochs=epochs,
+                   my_model=my_model)
 
-    if has_model():
+    if has_model(my_model):
         logging.info('There is already a trained model in "utils/files"!')
         _model.load_model()
     else:

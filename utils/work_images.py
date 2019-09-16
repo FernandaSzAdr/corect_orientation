@@ -49,6 +49,7 @@ def rotate(path, image, orientation, save_path):
     M = cv2.getRotationMatrix2D(center, rotated_dict.get(orientation), scale)
     img = cv2.warpAffine(img, M, (h, w))
 
+    image = image.replace('jpg', 'png')
     cv2.imwrite(save_path + '/' + image, img)
 
     return img
