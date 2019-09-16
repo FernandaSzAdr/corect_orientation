@@ -1,4 +1,6 @@
+import logging
 import matplotlib.pyplot as plt
+import os
 import pandas as pd
 
 from utils.work_images import read_path
@@ -13,8 +15,7 @@ from keras.preprocessing.image import ImageDataGenerator
 
 class Model:
 
-    def __init__(self, shape=(32, 32, 3), num_classes=4, is_plot=True,
-                 path_database='database/{}', epochs=8):
+    def __init__(self, shape, num_classes, is_plot, path_database, epochs):
         self.opt = keras.optimizers.rmsprop(lr=0.0001, decay=1e-5)
         self.shape = shape
         self.num_classes = num_classes
@@ -65,7 +66,7 @@ class Model:
         plt.ylabel('Accuracy')
         plt.xlabel('Epoch')
         plt.legend(['Train', 'Test'], loc='upper left')
-        plt.savefig('utils/acc_epoch.jpg')
+        plt.savefig('utils/files/acc_epoch.jpg')
 
         # Plot training & validation loss values
         plt.plot(self.history.history['loss'])
@@ -74,22 +75,24 @@ class Model:
         plt.ylabel('Loss')
         plt.xlabel('Epoch')
         plt.legend(['Train', 'Test'], loc='upper left')
-        plt.savefig('utils/loss_epoch.jpg')
+        plt.savefig('utils/files/loss_epoch.jpg')
 
     def save_model(self):
         model_json = self.model.to_json()
-        with open('utils/model.json', 'w') as json_file:
-            json_file.write(model_json)
+        with open('utils/files/model.json', 'w') as json_files:
+            json_files.write(model_json)
 
-        self.model.save_weights('utils/model.h5')
+        self.model.save_weights('utils/files/model.h5')
+        logging.info('Model and your weights were save in "utils/files"!')
 
     def load_model(self):
-        json_file = open('utils/model.json', 'r')
-        loaded_model_json = json_file.read()
-        json_file.close()
+        json_files = open('utils/files/model.json', 'r')
+        loaded_model_json = json_files.read()
+        json_files.close()
 
         self.model = model_from_json(loaded_model_json)
-        self.model.load_weights('utils/model.h5')
+        self.model.load_weights('utils/files/model.h5')
+        logging.info('Successfully loaded trained model!')
 
     def datagen_image(self, type):
         label_train = pd.read_csv(self.path_database.format('train.truth.csv'))
@@ -125,3 +128,26 @@ class Model:
     def predictions(self):
         x_test = read_path(self.path_database.format('test'), self.shape[:2])
         return self.model.predict_classes(x_test)
+
+
+def has_model():
+    return os.path.exists('utils/files/model.h5')
+
+
+def model(shape, num_classes, is_plot, path_database, epochs):
+
+    _model = Model(shape=shape, num_classes=num_classes, is_plot=is_plot,
+                   path_database=path_database, epochs=epochs)
+
+    if has_model():
+        logging.info('There is already a trained model in "utils/files"!')
+        _model.load_model()
+    else:
+        logging.info('There is not already a trained model!')
+        logging.info('Create a model and train it!')
+        _model.create_model()
+        _model.compile_model()
+        _model.train()
+        _model.save_model()
+
+    return _model

@@ -6,6 +6,13 @@ from zipfile import ZipFile
 
 
 def read_path(folder_path, size):
+    """
+        Convert all files in a folder to images. Your return is used in
+        `model.predictions()`.
+
+        The size of the images are change to 32x32 (model input size) only for
+        use in `model.predictions`.
+    """
     images = []
     for img in os.listdir(folder_path):
         img = os.path.join(folder_path, img)
@@ -21,23 +28,21 @@ def read_path(folder_path, size):
 
 def zip_path(path, files):
     with ZipFile(path, 'w') as zip:
-        for file in files:
-            zip.write(file)
+        for files in files:
+            zip.write(files)
 
 
 def rotate(path, image, orientation, save_path):
     rotated_dict = {
-        '0': 270,
-        '1': 90,
-        '2': 0,
-        '3': 180,
+        '0': 270,  # rotated_left
+        '1': 90,  # rotated_right
+        '2': 0,  # upright
+        '3': 180,  # upside_down
     }
 
     img = cv2.imread(path + '/' + image)
 
-    # get image height, width
     (h, w) = img.shape[:2]
-    # calculate the center of the image
     center = (w / 2, h / 2)
     scale = 1.0
 
@@ -45,3 +50,5 @@ def rotate(path, image, orientation, save_path):
     img = cv2.warpAffine(img, M, (h, w))
 
     cv2.imwrite(save_path + '/' + image, img)
+
+    return img

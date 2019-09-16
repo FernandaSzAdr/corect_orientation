@@ -1,43 +1,34 @@
 import logging
 import os
-import pandas as pd
-import shutil
 
-from utils.model import Model
-from utils.work_images import rotate, zip_path
-
-
-logging.getLogger().setLevel(logging.ERROR)
+from utils.model import model
+from utils.path import create_path, remove_path, dump_results
+from utils.work_images import rotate
 
 
-def have_model():
-    return os.path.exists('utils/model.h5')
-
-
-def create_path(path_results):
-    if not os.path.exists(path_results):
-        os.makedirs(path_results)
-
-
-def remove_path(path_results):
-    shutil.rmtree(path_results)
+logging.basicConfig(format='%(levelname)s:%(message)s',
+                    level=logging.INFO)
 
 
 if __name__ == '__main__':
-    path_results = 'results'
+    path_results = 'test'
     path_test = 'database/test'
-    _model = Model()
 
-    if not have_model():
-        _model.create_model()
-        _model.compile_model()
-        _model.train()
-        _model.save_model()
-    else:
-        _model.load_model()
+    """
+        Return the model trained. If don't have already a model trained, will
+        going to train the model.
+    """
+    _model = model(shape=(32, 32, 3), num_classes=4, is_plot=True,
+                   path_database='database/{}', epochs=8)
 
+    """
+        Path 'test/' is create exclusively to save model corrected images.
+        After zip the directory 'test/' it is removed.
+    """
     create_path(path_results)
+
     imgs = []
+    rotate_img = []
     predicts = []
 
     labels = {
@@ -53,12 +44,15 @@ if __name__ == '__main__':
         imgs.append(img)
         predicts.append(labels.get(pred))
 
-        rotate(path_test, img, pred, path_results)
+        rotate_img.append(rotate(path=path_test, image=img, orientation=pred,
+                                 save_path=path_results))
 
-    df = pd.DataFrame({'fn': imgs, 'label': predicts})
-    df.to_csv('test.preds.csv', index=False)
-
-    imgs = [path_results + '/' + img for img in imgs]
-    zip_path('test_result.zip', imgs)
+    """
+        Dump in 'output/': numpy array with corrected orientation faces,
+        csv with the labels resulting from the model and the zip files with
+        images after corrected orientation process.
+    """
+    dump_results(imgs, predicts, path_results, rotate_img)
+    logging.info('The result is dump in "output/"!')
 
     remove_path(path_results)
